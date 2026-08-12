@@ -45,6 +45,8 @@
   --color-success: var(--success);
   --color-success-light: var(--success-light);
   --color-ring: var(--ring);
+  --color-popover: var(--card);
+  --color-popover-foreground: var(--card-foreground);
   --font-sans: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, system-ui, sans-serif;
   /* DGA radii: sm 4 (buttons) / md 8 / lg 16 (cards) */
   --radius-sm: 4px;

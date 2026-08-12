@@ -1,8 +1,55 @@
-// رابط نصي يفتح نافذة (Dialog من Base UI) تعرض صور صفحات المستند.
+// رابط نصي يفتح المستند: نافذة (Dialog) على الشاشات الواسعة،
+// ودرج سفلي قابل للسحب (Drawer) على الجوال — بنمط المشاريع الشقيقة.
+import { useState } from 'react';
 import { Dialog } from '@base-ui/react/dialog';
-import { FileText, X } from 'lucide-react';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
+import { Skeleton } from '@/components/ui/skeleton';
+import { PHONE_QUERY, useMediaQuery } from '@/hooks/use-media-query';
 import { cn } from '@/lib/utils';
+import { FileText, X } from 'lucide-react';
 import type { ReactNode } from 'react';
+
+const TRIGGER_CLASS =
+  'inline cursor-pointer border-0 bg-transparent p-0 align-baseline font-[inherit] text-[length:inherit] font-semibold text-primary underline decoration-primary/40 underline-offset-4 hover:decoration-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring';
+
+export interface DocPage {
+  src: string;
+  width: number;
+  height: number;
+}
+
+/** صفحة مستند: أثناء التحميل فقط تحجز الحاوية المقاس الفعلي بهيكل نابض
+ *  (بلا قفزة تخطيط)؛ وبعده تعود الصورة لتدفقها الطبيعي كاملة دون قص. */
+function PageImage({ page, alt }: { page: DocPage; alt: string }) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div
+      style={loaded ? undefined : { aspectRatio: `${page.width} / ${page.height}` }}
+      className="relative w-full rounded-sm border border-border bg-white"
+    >
+      {!loaded && <Skeleton className="absolute inset-0 rounded-[inherit]" />}
+      <img
+        src={page.src}
+        alt={alt}
+        width={page.width}
+        height={page.height}
+        loading="lazy"
+        onLoad={() => setLoaded(true)}
+        className={cn('h-auto w-full rounded-[inherit]', !loaded && 'invisible')}
+      />
+    </div>
+  );
+}
+
+function Pages({ title, pages }: { title: string; pages: DocPage[] }) {
+  return (
+    <>
+      {pages.map((page, i) => (
+        <PageImage key={page.src} page={page} alt={`${title} — صفحة ${i + 1}`} />
+      ))}
+    </>
+  );
+}
 
 export function DocDialog({
   label,
@@ -12,19 +59,33 @@ export function DocDialog({
 }: {
   label: ReactNode;
   title: string;
-  pages: string[];
+  pages: DocPage[];
   className?: string;
 }) {
+  const isPhone = useMediaQuery(PHONE_QUERY);
+
+  if (isPhone) {
+    return (
+      <Drawer showSwipeHandle>
+        <DrawerTrigger className={cn(TRIGGER_CLASS, className)}>{label}</DrawerTrigger>
+        <DrawerContent dir="rtl">
+          <DrawerHeader className="pb-2">
+            <DrawerTitle className="flex items-center justify-center gap-2 text-sm font-bold">
+              <FileText className="size-4 shrink-0 text-primary" aria-hidden />
+              {title}
+            </DrawerTitle>
+          </DrawerHeader>
+          <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain bg-muted p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+            <Pages title={title} pages={pages} />
+          </div>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
   return (
     <Dialog.Root>
-      <Dialog.Trigger
-        className={cn(
-          'inline cursor-pointer border-0 bg-transparent p-0 align-baseline font-[inherit] text-[length:inherit] font-semibold text-primary underline decoration-primary/40 underline-offset-4 hover:decoration-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring',
-          className,
-        )}
-      >
-        {label}
-      </Dialog.Trigger>
+      <Dialog.Trigger className={cn(TRIGGER_CLASS, className)}>{label}</Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-40 bg-black/50" />
         <Dialog.Popup
@@ -44,15 +105,7 @@ export function DocDialog({
             </Dialog.Close>
           </header>
           <div className="flex flex-col gap-3 overflow-y-auto bg-muted p-4">
-            {pages.map((src, i) => (
-              <img
-                key={src}
-                src={src}
-                alt={`${title} — صفحة ${i + 1}`}
-                loading="lazy"
-                className="w-full rounded-sm border border-border bg-white"
-              />
-            ))}
+            <Pages title={title} pages={pages} />
           </div>
         </Dialog.Popup>
       </Dialog.Portal>

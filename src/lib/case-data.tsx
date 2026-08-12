@@ -41,14 +41,21 @@ export const dayParts = (n: number): { num: string | null; word: string } => {
 export const DOC_LINK_INLINE =
   '!inline appearance-none whitespace-normal break-words text-start leading-[inherit]';
 
+// كل الصفحات مولدة بمقاس 1157×1638 (140dpi) — تُمرر الأبعاد ليُحجز المقاس قبل التحميل.
+const page = (src: string) => ({ src, width: 1157, height: 1638 });
+
 export const SUPREME_ORDER_DOC = {
   title: 'برقية الأمر السامي 7/ب/12814 — مكافأة الطلبة الجامعيين المعاقين',
-  pages: ['/docs/supreme-order-1.jpg'],
+  pages: [page('/docs/supreme-order-1.jpg')],
 };
 
 export const CHARTER_DOC = {
   title: 'لائحة حقوق وواجبات الطالب — المواد 66–69 (م67/ز: بدل ذوي الاحتياجات الخاصة)',
-  pages: ['/docs/student-charter-1.jpg', '/docs/student-charter-2.jpg', '/docs/student-charter-3.jpg'],
+  pages: [
+    page('/docs/student-charter-1.jpg'),
+    page('/docs/student-charter-2.jpg'),
+    page('/docs/student-charter-3.jpg'),
+  ],
 };
 
 export const FAQ: { q: string; a: ReactNode }[] = [
