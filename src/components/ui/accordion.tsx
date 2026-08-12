@@ -1,5 +1,6 @@
 // shadcn-style Accordion built on Base UI primitives.
 import { Accordion as BaseAccordion } from '@base-ui/react/accordion';
+import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ComponentProps } from 'react';
@@ -45,7 +46,15 @@ export function AccordionContent({
 }: ComponentProps<typeof BaseAccordion.Panel>) {
   return (
     <BaseAccordion.Panel className={cn('overflow-hidden', className)} {...props}>
-      <div className="pb-4 text-sm leading-7 text-muted-foreground">{children}</div>
+      {/* يُركَّب المحتوى عند كل فتح، فتعمل حركة الدخول (ارتفاع 0 ← تلقائي) في كل مرة. */}
+      <motion.div
+        initial={{ height: 0, opacity: 0 }}
+        animate={{ height: 'auto', opacity: 1 }}
+        transition={{ duration: 0.25, ease: 'easeOut' }}
+        className="overflow-hidden"
+      >
+        <div className="pb-4 text-sm leading-7 text-muted-foreground">{children}</div>
+      </motion.div>
     </BaseAccordion.Panel>
   );
 }

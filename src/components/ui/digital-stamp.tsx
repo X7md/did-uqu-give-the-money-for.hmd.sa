@@ -2,6 +2,7 @@
 // شريط بخلفية محايدة، رأس قابل للطي (أيقونة + نص + رابط)، ومحتوى من عناصر
 // تحقق دائرية الأيقونات — بنفس البنية والمقاسات (36px، حد أخضر، ظل خفيف).
 import { useState, type ReactNode } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, Stamp, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -42,27 +43,43 @@ export function DigitalStamp({
         </span>
       </button>
 
-      {open && (
-        <div className="mt-4 flex flex-wrap items-start gap-4 pb-4 sm:mt-6 sm:gap-[18px] sm:pb-6">
-          {items.map(({ icon: Icon, title, description, ok = true }) => (
-            <div key={title} className="flex w-full items-start gap-4 sm:w-[calc(50%-9px)] sm:gap-6">
-              <span
-                className={cn(
-                  'flex size-8 shrink-0 items-center justify-center rounded-full border shadow-sm sm:size-9',
-                  ok ? 'border-success text-success' : 'border-destructive text-destructive',
-                )}
-              >
-                <Icon className="size-4" aria-hidden />
-              </span>
-              <span className="flex flex-col gap-1">
-                <span className="text-sm font-semibold">{title}</span>
-                <span className="text-xs leading-5 text-muted-foreground">{description}</span>
-              </span>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.28, ease: 'easeOut' }}
+            className="overflow-hidden"
+          >
+            <div className="mt-4 flex flex-wrap items-start gap-4 pb-4 sm:mt-6 sm:gap-[18px] sm:pb-6">
+              {items.map(({ icon: Icon, title, description, ok = true }, i) => (
+                <motion.div
+                  key={title}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25, delay: 0.08 + i * 0.05 }}
+                  className="flex w-full items-start gap-4 sm:w-[calc(50%-9px)] sm:gap-6"
+                >
+                  <span
+                    className={cn(
+                      'flex size-8 shrink-0 items-center justify-center rounded-full border shadow-sm sm:size-9',
+                      ok ? 'border-success text-success' : 'border-destructive text-destructive',
+                    )}
+                  >
+                    <Icon className="size-4" aria-hidden />
+                  </span>
+                  <span className="flex flex-col gap-1">
+                    <span className="text-sm font-semibold">{title}</span>
+                    <span className="text-xs leading-5 text-muted-foreground">{description}</span>
+                  </span>
+                </motion.div>
+              ))}
+              {registration && <div className="w-full">{registration}</div>}
             </div>
-          ))}
-          {registration && <div className="w-full">{registration}</div>}
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
