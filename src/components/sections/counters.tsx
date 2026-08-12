@@ -1,26 +1,39 @@
-// جزيرة تفاعلية: العدادات تُحسب في متصفح الزائر (لا تتجمد عند وقت البناء).
+// جزيرة تفاعلية: العدادات تُحسب في متصفح الزائر بأيام تقويمية بتوقيت السعودية —
+// تُعاد بعد الترطيب (فلا تتجمد عند وقت البناء) وتنقلب تلقائيًا عند منتصف الليل بمكة.
 import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Reveal } from '@/components/reveal';
 import { Riyal } from '@/components/riyal';
-import { APPEAL_DATE, AWARD_MONTHS, DEED_DATE, JUDGMENT_DATE, dayParts, daysSince } from '@/lib/case-data';
+import {
+  APPEAL_ISO,
+  AWARD_MONTHS,
+  DEED_ISO,
+  JUDGMENT_ISO,
+  dayParts,
+  daysSinceKSA,
+  msUntilNextKsaMidnight,
+} from '@/lib/case-data';
 
 export function Counters() {
-  // إعادة الحساب بعد الترطيب حتى تعكس الأرقام يوم الزيارة لا يوم البناء.
-  const [now, setNow] = useState(0);
-  useEffect(() => setNow(Date.now()), []);
+  const [today, setToday] = useState(''); // فارغ أثناء SSG؛ يُملأ بعد الترطيب فيُعاد الحساب.
+  useEffect(() => {
+    const tick = () => setToday(new Date().toISOString());
+    tick();
+    const timer = setTimeout(tick, msUntilNextKsaMidnight() + 1000);
+    return () => clearTimeout(timer);
+  }, [today]);
 
   return (
     <>
-      <div className="grid w-full grid-cols-1 gap-3 pt-6 sm:grid-cols-3" data-now={now}>
+      <div className="grid w-full grid-cols-1 gap-3 pt-6 sm:grid-cols-3" data-today={today}>
         <Reveal>
-          <Stat n={daysSince(JUDGMENT_DATE)} label="منذ النطق بالحكم الابتدائي" />
+          <Stat n={daysSinceKSA(JUDGMENT_ISO)} label="منذ النطق بالحكم الابتدائي" />
         </Reveal>
         <Reveal delay={0.07}>
-          <Stat n={daysSince(DEED_DATE)} label="منذ استلام الصك" />
+          <Stat n={daysSinceKSA(DEED_ISO)} label="منذ استلام الصك" />
         </Reveal>
         <Reveal delay={0.14}>
-          <Stat n={daysSince(APPEAL_DATE)} label="منذ استئناف الجامعة" />
+          <Stat n={daysSinceKSA(APPEAL_ISO)} label="منذ استئناف الجامعة" />
         </Reveal>
       </div>
       <Reveal className="w-full">

@@ -12,13 +12,24 @@ import {
 } from 'lucide-react';
 import type { StampItem } from '@/components/ui/digital-stamp';
 
-export const JUDGMENT_DATE = new Date('2026-06-08'); // النطق 1447-12-22هـ
-export const DEED_DATE = new Date('2026-06-23'); // تسليم الصك 1448-01-08هـ
-export const APPEAL_DATE = new Date('2026-07-26'); // وصول لائحة استئناف الجامعة
+export const JUDGMENT_ISO = '2026-06-08'; // النطق 1447-12-22هـ
+export const DEED_ISO = '2026-06-23'; // تسليم الصك 1448-01-08هـ
+export const APPEAL_ISO = '2026-07-26'; // وصول لائحة استئناف الجامعة
 export const AWARD_MONTHS = 39; // المدة المحكوم بها: 1443/03/19هـ ← 1446/06/30هـ
 
-export const daysSince = (d: Date) =>
-  Math.max(0, Math.floor((Date.now() - d.getTime()) / 86_400_000));
+const KSA_TZ = 'Asia/Riyadh';
+export const KSA_UTC_OFFSET_MS = 3 * 3_600_000; // توقيت السعودية ثابت +3 بلا توقيت صيفي
+
+/** تاريخ اليوم بتقويم السعودية بصيغة YYYY-MM-DD. */
+export const todayKSA = () => new Intl.DateTimeFormat('en-CA', { timeZone: KSA_TZ }).format(new Date());
+
+/** فرق الأيام التقويمية بتوقيت السعودية — ينقلب العداد عند منتصف الليل بمكة لا UTC. */
+export const daysSinceKSA = (isoDate: string) =>
+  Math.max(0, Math.round((Date.parse(todayKSA()) - Date.parse(isoDate)) / 86_400_000));
+
+/** المدة المتبقية حتى منتصف الليل القادم بتوقيت السعودية. */
+export const msUntilNextKsaMidnight = () =>
+  86_400_000 - ((Date.now() + KSA_UTC_OFFSET_MS) % 86_400_000);
 
 // تمييز «يوم» حسب قواعد العدد العربية (فئات CLDR عبر Intl.PluralRules):
 // 1 «يوم واحد» · 2 «يومان» · 3–10 «أيام» · 11–99 «يومًا» · 0 و100 وما وافقها «يوم».
@@ -116,6 +127,19 @@ export const FAQ: { q: string; a: ReactNode }[] = [
     a: 'صاحب الحق في الدعوى 75594 بصفته الشخصية. الموقع مستقل ولا يتبع أي جهة.',
   },
 ];
+
+// نسخة نصية صرفة من الإجابات (لبيانات schema.org — الإجابتان المركّبتان لهما بديل نصي).
+const PLAIN_ANSWERS: Record<string, string> = {
+  'ما سند الاستحقاق أصلًا؟':
+    'الأمر السامي رقم 7/ب/12814 وتاريخ 1420/08/13هـ، والفقرة (ز) من المادة 67 من لائحة حقوق وواجبات الطالب بالجامعة نفسها، وقرار وزارة الموارد البشرية بتصنيف الإعاقة (الفئة الثانية). أي أن الجامعة تُطالَب بتطبيق لائحتها هي.',
+  'كم المبلغ الذي لم يُصرف؟':
+    'بدل شهري مقداره 1500 ريال سعودي (الفئة الثانية — متوسطو الإعاقة) عن كامل المدة المحكوم بها ابتدائيًا (1443/03/19هـ حتى 1446/06/30هـ).',
+};
+
+export const FAQ_LD: { q: string; a: string }[] = FAQ.map(({ q, a }) => ({
+  q,
+  a: typeof a === 'string' ? a : (PLAIN_ANSWERS[q] ?? ''),
+})).filter((f) => f.a);
 
 export const STATUS = [
   { icon: CircleCheck, label: 'قرار الامتناع', detail: 'أُلغي بحكم ابتدائي', ok: true },

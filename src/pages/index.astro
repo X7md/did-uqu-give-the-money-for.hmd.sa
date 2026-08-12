@@ -6,12 +6,58 @@ import { Counters } from '@/components/sections/counters';
 import { BentoSection } from '@/components/sections/bento';
 import { CasePathSection } from '@/components/sections/case-path';
 import { FaqSection } from '@/components/sections/faq';
+import { FAQ_LD } from '@/lib/case-data';
+import { CASE_NAME, COVERAGE_RANGE, SITE_DESCRIPTION, SITE_LAUNCHED_ISO, SITE_TITLE } from '@/lib/updates';
 
 const NAV = [
   ['ما هذا البدل؟', '#intro-title'],
   ['مسار القضية', '#path-title'],
   ['الأسئلة الشائعة', '#faq-title'],
 ];
+
+const SITE_URL = Astro.site?.href ?? 'https://did-uqu-give-the-money-to.hmd.sa/';
+const BUILD_TIME = new Date().toISOString(); // يتجدد مع إعادة البناء اليومية
+
+// schema.org: موقع + صفحة أسئلة شائعة عن قضية جارية — dateModified يتحدث يوميًا،
+// وtemporalCoverage فترة مفتوحة منذ بداية المدة المحكوم بها.
+const LD = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE_URL}#website`,
+      url: SITE_URL,
+      name: SITE_TITLE,
+      description: SITE_DESCRIPTION,
+      inLanguage: 'ar',
+    },
+    {
+      '@type': ['WebPage', 'FAQPage'],
+      '@id': `${SITE_URL}#page`,
+      url: SITE_URL,
+      name: SITE_TITLE,
+      description: SITE_DESCRIPTION,
+      inLanguage: 'ar',
+      isPartOf: { '@id': `${SITE_URL}#website` },
+      datePublished: SITE_LAUNCHED_ISO,
+      dateModified: BUILD_TIME,
+      temporalCoverage: COVERAGE_RANGE,
+      about: {
+        '@type': 'Thing',
+        name: CASE_NAME,
+        identifier: [
+          { '@type': 'PropertyValue', name: 'رقم الدعوى', value: '75594' },
+          { '@type': 'PropertyValue', name: 'العام الهجري', value: '1447' },
+        ],
+      },
+      mainEntity: FAQ_LD.map(({ q, a }) => ({
+        '@type': 'Question',
+        name: q,
+        acceptedAnswer: { '@type': 'Answer', text: a },
+      })),
+    },
+  ],
+};
 ---
 
 <html lang="ar" dir="rtl">
@@ -25,6 +71,19 @@ const NAV = [
       content="صفحة حالة فكاهية بسؤال واحد: هل صرفت جامعة أم القرى بدل الإعاقة عن فترة سابقة؟ الجواب حتى الآن: لا (ليس بعد). تستند لوقائع الدعوى 75594 لعام 1447هـ."
     />
     <title>هل صرفت الجامعة المستحقات؟ — لا (ليس بعد)</title>
+    <link rel="canonical" href={SITE_URL} />
+    <link rel="alternate" type="application/rss+xml" title="تحديثات القضية 75594" href="/rss.xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={SITE_URL} />
+    <meta property="og:title" content={SITE_TITLE} />
+    <meta property="og:description" content={SITE_DESCRIPTION} />
+    <meta property="og:locale" content="ar_SA" />
+    <meta property="og:site_name" content="منصة «هل صُرفت المستحقات؟»" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={SITE_TITLE} />
+    <meta name="twitter:description" content={SITE_DESCRIPTION} />
+    <script type="application/ld+json" set:html={JSON.stringify(LD)} />
   </head>
   <body>
     <div dir="rtl" class="flex min-h-dvh flex-col">
@@ -110,6 +169,19 @@ const NAV = [
           <p class="m-0">
             موقع فكاهي توثيقي مستقل لا يمثل أي جهة — الوقائع من ملف الدعوى <bdi>75594</bdi> لعام
             <bdi>1447هـ</bdi>، ويُحدَّث الجواب فور الصرف.
+          </p>
+          <p class="m-0 pt-1">
+            <a
+              href="/rss.xml"
+              class="inline-flex items-center gap-1 text-primary no-underline hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5" aria-hidden="true">
+                <path d="M4 11a9 9 0 0 1 9 9"></path>
+                <path d="M4 4a16 16 0 0 1 16 16"></path>
+                <circle cx="5" cy="19" r="1"></circle>
+              </svg>
+              خلاصة RSS لتحديثات القضية
+            </a>
           </p>
           <p class="m-0 pt-1 text-muted-foreground/80">
             © <bdi>١٤٤٨هـ</bdi> / <time datetime="2026">٢٠٢٦م</time>
