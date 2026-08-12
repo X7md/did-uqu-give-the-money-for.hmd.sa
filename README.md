@@ -1,4 +1,4 @@
-# did-uqu-give-the-money.to.hmd.sa
+# did-uqu-give-the-money-to.hmd.sa
 
 صفحة حالة فكاهية بسؤال واحد وجواب واحد:
 
