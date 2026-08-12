@@ -6,7 +6,20 @@ import { Card } from '@/components/ui/card';
 import { DigitalStamp } from '@/components/ui/digital-stamp';
 import { DocDialog } from '@/components/ui/doc-dialog';
 import { Riyal } from '@/components/riyal';
-import { CircleCheck, CircleX, Download, FileCheck2, Mails, Scale } from 'lucide-react';
+import {
+  Accessibility,
+  BookOpen,
+  Building2,
+  CircleCheck,
+  CircleX,
+  Download,
+  FileCheck2,
+  Globe,
+  ListChecks,
+  Mails,
+  Scale,
+  ScrollText,
+} from 'lucide-react';
 
 // ── الحقائق الثابتة (من صك الحكم ووثائق القضية 75594 لعام 1447هـ) ─────────────
 const JUDGMENT_DATE = new Date('2026-06-08'); // النطق 1447-12-22هـ
@@ -126,6 +139,18 @@ const CASE_PATH = [
 
 const STAMP_ITEMS = [
   {
+    icon: Globe,
+    title: 'تحقق من الرابط',
+    description: (
+      <>
+        رابط موقع شخصي بنطاق سعودي ينتهي بـ{' '}
+        <bdi dir="ltr" className="font-mono">
+          .sa
+        </bdi>
+      </>
+    ),
+  },
+  {
     icon: FileCheck2,
     title: 'صك الحكم الابتدائي',
     description: 'الدعوى 75594 لعام 1447هـ — نسخة مستخرجة من بوابة ديوان المظالم (غير نهائي؛ منظور استئنافًا).',
@@ -152,21 +177,39 @@ export default function App() {
   return (
     <div dir="rtl" className="flex min-h-dvh flex-col">
       <div className="border-b border-border bg-muted">
-        <div className="mx-auto w-full max-w-3xl px-5">
+        <div className="mx-auto w-full max-w-3xl lg:max-w-5xl px-5">
           <DigitalStamp
             heading="هذا ليس موقعًا حكوميًا — صفحة فكاهية مستقلة موثقة ذاتيًا من صاحب الحق"
+            registration={
+              <div className="inline-flex items-center gap-x-6 rounded-md border border-border/60 bg-card px-6 py-2">
+                <Riyal className="size-6 shrink-0 text-primary" />
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <p className="m-0 text-sm font-normal text-foreground">قضية منظورة في المحكمة برقم:</p>
+                  <a
+                    className="cursor-pointer text-sm font-normal text-primary underline hover:text-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+                    href="https://www.bog.gov.sa"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <bdi>75594</bdi> لعام <bdi>1447هـ</bdi>
+                  </a>
+                </div>
+              </div>
+            }
             items={STAMP_ITEMS}
             className="rounded-none bg-transparent px-0"
           />
         </div>
       </div>
 
-      <div className="mx-auto flex w-full max-w-3xl grow flex-col px-5 py-8">
-        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-6">
-          <div className="flex items-center gap-3">
-            <span className="flex size-10 items-center justify-center rounded-md bg-primary text-lg font-black text-primary-foreground">
+      {/* شريط التنقل العلوي — على نمط dga-nav-header: 72px، خلفية بيضاء، فاصل سفلي */}
+      <header className="relative z-40 h-[72px] w-full bg-card after:absolute after:bottom-0 after:left-0 after:block after:h-px after:w-full after:bg-border">
+        <nav className="mx-auto flex h-full w-full max-w-3xl items-center justify-between px-5 lg:max-w-5xl">
+          <div className="flex items-center">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary text-lg font-black text-primary-foreground">
               لا
             </span>
+            <span className="mx-4 h-12 w-px bg-black/20" aria-hidden />
             <div>
               <p className="m-0 text-sm font-bold">منصة «هل صُرفت المستحقات؟»</p>
               <p className="m-0 font-mono text-xs text-muted-foreground" dir="ltr">
@@ -174,8 +217,29 @@ export default function App() {
               </p>
             </div>
           </div>
-          <Badge variant="outline">الإصدار 1448.02 · يُحدَّث حتى الصرف</Badge>
-        </header>
+          <ul className="m-0 hidden h-full list-none items-center p-0 md:flex">
+            {[
+              ['ما هذا البدل؟', '#intro-title'],
+              ['مسار القضية', '#path-title'],
+              ['الأسئلة الشائعة', '#faq-title'],
+            ].map(([label, href]) => (
+              <li key={href} className="h-full">
+                <a
+                  href={href}
+                  className="inline-flex h-full items-center gap-1 rounded-sm px-6 text-sm text-foreground no-underline hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+                >
+                  {label}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <Badge variant="outline" className="hidden sm:inline-flex">
+            الإصدار 1448.02 · يُحدَّث حتى الصرف
+          </Badge>
+        </nav>
+      </header>
+
+      <div className="mx-auto flex w-full max-w-3xl lg:max-w-5xl grow flex-col px-5 py-8">
 
         {/* السؤال والجواب */}
         <main className="flex flex-col items-center gap-6 py-14 text-center">
@@ -224,9 +288,113 @@ export default function App() {
           </Card>
         </main>
 
+        {/* التعريف — بينتو */}
+        <section aria-labelledby="intro-title" className="pb-10">
+          <h2 id="intro-title" className="m-0 mb-1 scroll-mt-6 text-xl font-bold">
+            ما هذا «البدل» أصلًا؟
+          </h2>
+          <p className="m-0 mb-4 text-sm text-muted-foreground">
+            تنظيم عمره أكثر من أربعين عامًا — لا طلبًا مستحدثًا.
+          </p>
+          <div className="grid grid-cols-6 gap-3">
+            {/* الأصل: بدل قارئ ووسائل معينة */}
+            <Card className="col-span-6 p-6 sm:col-span-4">
+              <div className="mb-3 flex items-center gap-2">
+                <span className="flex size-9 items-center justify-center rounded-md bg-primary-light text-primary">
+                  <BookOpen className="size-4" aria-hidden />
+                </span>
+                <h3 className="m-0 text-base font-bold">البداية: «بدل قارئ ووسائل معينة»</h3>
+              </div>
+              <p className="m-0 text-sm leading-7 text-muted-foreground">
+                بقرار مجلس الوزراء رقم (15) وتاريخ 1400/02/26هـ تقررت مكافأة شهرية للطلبة الجامعيين
+                «المكفوفين» تعادل راتب الدرجة الأولى من المرتبة الخامسة — سُميت «بدل قارئ ووسائل
+                معينة» لأن غرضها تمكين الطالب الكفيف من الاستعانة بقارئ وبالوسائل المساعدة على
+                الدراسة والتنقل.
+              </p>
+            </Card>
+            {/* عمر التنظيم */}
+            <Card className="col-span-6 flex flex-col items-center justify-center bg-primary p-6 text-center text-primary-foreground sm:col-span-2">
+              <p className="m-0 text-5xl font-black">+40</p>
+              <p className="m-0 pt-1 text-sm font-semibold">عامًا على التنظيم الأصلي (1400هـ)</p>
+            </Card>
+            {/* التوسعة بالأمر السامي */}
+            <Card className="col-span-6 p-6 sm:col-span-3">
+              <div className="mb-3 flex items-center gap-2">
+                <span className="flex size-9 items-center justify-center rounded-md bg-primary-light text-primary">
+                  <ScrollText className="size-4" aria-hidden />
+                </span>
+                <h3 className="m-0 text-base font-bold">التوسعة: الأمر السامي 7/ب/12814</h3>
+              </div>
+              <p className="m-0 text-sm leading-7 text-muted-foreground">
+                في 1420/08/13هـ صدر{' '}
+                <DocDialog
+                  label="الأمر السامي رقم 7/ب/12814"
+                  title="برقية الأمر السامي 7/ب/12814 — مكافأة الطلبة الجامعيين المعاقين"
+                  pages={['/docs/supreme-order-1.jpg']}
+                  className={DOC_LINK_INLINE}
+                />{' '}
+                بشمول الطلبة الجامعيين «المعاقين» بالمكافأة أسوة بزملائهم المكفوفين: شديدو الإعاقة
+                بما يعادل راتب الدرجة الأولى من المرتبة الخامسة، ومتوسطو الإعاقة بمبلغ 1500{' '}
+                <Riyal /> شهريًا — على أن تتولى وزارة العمل والشؤون الاجتماعية (الموارد البشرية
+                حاليًا) تحديد نوع الإعاقة ومستواها.
+              </p>
+            </Card>
+            {/* الفئات */}
+            <Card className="col-span-6 p-6 sm:col-span-3">
+              <div className="mb-3 flex items-center gap-2">
+                <span className="flex size-9 items-center justify-center rounded-md bg-primary-light text-primary">
+                  <ListChecks className="size-4" aria-hidden />
+                </span>
+                <h3 className="m-0 text-base font-bold">صُنفت إلى فئتين</h3>
+              </div>
+              <ul className="m-0 flex list-none flex-col gap-2 p-0 text-sm leading-7 text-muted-foreground">
+                <li>
+                  <strong className="text-foreground">الفئة الأولى (شديد الإعاقة):</strong> راتب
+                  الدرجة الأولى من المرتبة الخامسة.
+                </li>
+                <li>
+                  <strong className="text-foreground">الفئة الثانية (متوسط الإعاقة):</strong> 1500{' '}
+                  <Riyal /> شهريًا — وهي فئة صاحب هذه الصفحة بقرار الوزارة.
+                </li>
+                <li>
+                  تعميم وزارة التعليم ووزارة العمل والتنمية الاجتماعية (1440هـ) يفصّل الحالات
+                  المستحقة لكل فئة.
+                </li>
+              </ul>
+            </Card>
+            {/* في لائحة الجامعة */}
+            <Card className="col-span-6 p-6 sm:col-span-4">
+              <div className="mb-3 flex items-center gap-2">
+                <span className="flex size-9 items-center justify-center rounded-md bg-primary-light text-primary">
+                  <Building2 className="size-4" aria-hidden />
+                </span>
+                <h3 className="m-0 text-base font-bold">وفي لائحة الجامعة نفسها</h3>
+              </div>
+              <p className="m-0 text-sm leading-7 text-muted-foreground">
+                الفقرة (ز) من المادة 67 من{' '}
+                <DocDialog
+                  label="لائحة حقوق وواجبات الطالب"
+                  title="لائحة حقوق وواجبات الطالب — المواد 66–69 (م67/ز: بدل ذوي الاحتياجات الخاصة)"
+                  pages={['/docs/student-charter-1.jpg', '/docs/student-charter-2.jpg', '/docs/student-charter-3.jpg']}
+                  className={DOC_LINK_INLINE}
+                />{' '}
+                تنص على البدل ذاته حرفيًا، وتُلزم «الجهات المختصة في الجامعة» بضمان حصول الطالب على
+                مكافآته وبدلاته المستحقة نظامًا «وانتظام صرفها دون تأخير».
+              </p>
+            </Card>
+            {/* الخلاصة */}
+            <Card className="col-span-6 flex flex-col items-center justify-center bg-primary-light p-6 text-center sm:col-span-2">
+              <Accessibility className="mb-2 size-8 text-primary" aria-hidden />
+              <p className="m-0 text-sm font-bold leading-6">
+                الوزارة تصنّف، والجامعة تصرف — هذا كل التنظيم.
+              </p>
+            </Card>
+          </div>
+        </section>
+
         {/* مسار القضية */}
         <section aria-labelledby="path-title" className="pb-10">
-          <h2 id="path-title" className="m-0 mb-1 text-xl font-bold">
+          <h2 id="path-title" className="m-0 mb-1 scroll-mt-6 text-xl font-bold">
             مسار القضية باختصار
           </h2>
           <p className="m-0 mb-4 text-sm text-muted-foreground">

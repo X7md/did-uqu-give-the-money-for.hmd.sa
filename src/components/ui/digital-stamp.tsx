@@ -1,24 +1,26 @@
 // محاكاة لمكوّن «الختم الرقمي» (DgaDigitalSignature) من كود المنصات:
 // شريط بخلفية محايدة، رأس قابل للطي (أيقونة + نص + رابط)، ومحتوى من عناصر
 // تحقق دائرية الأيقونات — بنفس البنية والمقاسات (36px، حد أخضر، ظل خفيف).
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { ChevronDown, Stamp, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface StampItem {
   icon: LucideIcon;
   title: string;
-  description: string;
+  description: ReactNode;
   ok?: boolean;
 }
 
 export function DigitalStamp({
   heading,
   items,
+  registration,
   className,
 }: {
   heading: string;
   items: StampItem[];
+  registration?: ReactNode;
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -35,18 +37,18 @@ export function DigitalStamp({
           {heading}
         </p>
         <span className="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-[13px] text-primary sm:gap-2 sm:text-sm">
-          {open ? 'إخفاء التفاصيل' : 'عرض التفاصيل'}
+          {open ? 'إخفاء التفاصيل' : 'كيف تتحقق'}
           <ChevronDown className={cn('size-4 shrink-0 transition-transform duration-200 sm:size-5', open && 'rotate-180')} aria-hidden />
         </span>
       </button>
 
       {open && (
-        <div className="mt-6 flex flex-wrap items-start gap-[18px]">
+        <div className="mt-4 flex flex-wrap items-start gap-4 pb-4 sm:mt-6 sm:gap-[18px] sm:pb-6">
           {items.map(({ icon: Icon, title, description, ok = true }) => (
-            <div key={title} className="flex w-full items-start gap-4 sm:w-[calc(50%-9px)]">
+            <div key={title} className="flex w-full items-start gap-4 sm:w-[calc(50%-9px)] sm:gap-6">
               <span
                 className={cn(
-                  'flex size-9 shrink-0 items-center justify-center rounded-full border shadow-sm',
+                  'flex size-8 shrink-0 items-center justify-center rounded-full border shadow-sm sm:size-9',
                   ok ? 'border-success text-success' : 'border-destructive text-destructive',
                 )}
               >
@@ -58,6 +60,7 @@ export function DigitalStamp({
               </span>
             </div>
           ))}
+          {registration && <div className="w-full">{registration}</div>}
         </div>
       )}
     </div>
