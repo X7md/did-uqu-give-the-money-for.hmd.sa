@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { DigitalStamp } from '@/components/ui/digital-stamp';
+import { DocDialog } from '@/components/ui/doc-dialog';
 import { Riyal } from '@/components/riyal';
 import { CircleCheck, CircleX, Download, FileCheck2, Mails, Scale } from 'lucide-react';
 
@@ -26,7 +27,23 @@ const FAQ: { q: string; a: ReactNode }[] = [
   },
   {
     q: 'ما سند الاستحقاق أصلًا؟',
-    a: 'الأمر السامي رقم 7/ب/12814 وتاريخ 1420/08/13هـ، والفقرة (ز) من المادة 67 من لائحة حقوق وواجبات الطالب بالجامعة نفسها، وقرار وزارة الموارد البشرية بتصنيف الإعاقة (الفئة الثانية). أي أن الجامعة تُطالَب بتطبيق لائحتها هي.',
+    a: (
+      <>
+        <DocDialog
+          label="الأمر السامي رقم 7/ب/12814 وتاريخ 1420/08/13هـ"
+          title="برقية الأمر السامي 7/ب/12814 — مكافأة الطلبة الجامعيين المعاقين"
+          pages={['/docs/supreme-order-1.jpg']}
+        />
+        ، والفقرة (ز) من المادة 67 من{' '}
+        <DocDialog
+          label="لائحة حقوق وواجبات الطالب"
+          title="لائحة حقوق وواجبات الطالب — المواد 66–69 (م67/ز: بدل ذوي الاحتياجات الخاصة)"
+          pages={['/docs/student-charter-1.jpg', '/docs/student-charter-2.jpg', '/docs/student-charter-3.jpg']}
+        />{' '}
+        بالجامعة نفسها، وقرار وزارة الموارد البشرية بتصنيف الإعاقة (الفئة الثانية). أي أن الجامعة
+        تُطالَب بتطبيق لائحتها هي.
+      </>
+    ),
   },
   {
     q: 'كم المبلغ الذي لم يُصرف؟',
@@ -201,6 +218,20 @@ export default function App() {
                 — منطوق الحكم الابتدائي، الدعوى 75594 لعام 1447هـ
               </footer>
             </blockquote>
+            <p className="m-0 mb-5 text-sm text-muted-foreground">
+              السندان الأصليان (انقر للاطلاع):{' '}
+              <DocDialog
+                label="الأمر السامي 7/ب/12814"
+                title="برقية الأمر السامي 7/ب/12814 — مكافأة الطلبة الجامعيين المعاقين"
+                pages={['/docs/supreme-order-1.jpg']}
+              />{' '}
+              ·{' '}
+              <DocDialog
+                label="لائحة حقوق وواجبات الطالب (م67/ز)"
+                title="لائحة حقوق وواجبات الطالب — المواد 66–69 (م67/ز: بدل ذوي الاحتياجات الخاصة)"
+                pages={['/docs/student-charter-1.jpg', '/docs/student-charter-2.jpg', '/docs/student-charter-3.jpg']}
+              />
+            </p>
             <ol className="m-0 flex list-none flex-col gap-5 p-0">
               {CASE_PATH.map(({ title, text }, i) => (
                 <li key={title} className="flex items-start gap-4">
