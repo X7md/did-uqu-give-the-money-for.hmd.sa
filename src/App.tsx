@@ -14,7 +14,27 @@ const DEED_DATE = new Date('2026-06-23'); // تسليم الصك 1448-01-08هـ
 const APPEAL_DATE = new Date('2026-07-26'); // وصول لائحة استئناف الجامعة
 const daysSince = (d: Date) => Math.max(0, Math.floor((Date.now() - d.getTime()) / 86_400_000));
 
+// تمييز «يوم» حسب قواعد العدد العربية (فئات CLDR عبر Intl.PluralRules):
+// 1 «يوم واحد» · 2 «يومان» · 3–10 «أيام» · 11–99 «يومًا» · 0 و100 وما وافقها «يوم».
+const DAY_WORD: Record<Intl.LDMLPluralRule, string> = {
+  zero: 'يوم',
+  one: 'يوم واحد',
+  two: 'يومان',
+  few: 'أيام',
+  many: 'يومًا',
+  other: 'يوم',
+};
+
+const dayParts = (n: number): { num: string | null; word: string } => {
+  const rule = new Intl.PluralRules('ar').select(n);
+  if (rule === 'one' || rule === 'two') return { num: null, word: DAY_WORD[rule] };
+  return { num: n.toLocaleString('ar-SA'), word: DAY_WORD[rule] };
+};
+
 const AWARD_MONTHS = 39; // المدة المحكوم بها: 1443/03/19هـ ← 1446/06/30هـ
+
+// يجعل زر المستند يجري مع نص الفقرة كسطر واحد (خصوصًا على iOS).
+const DOC_LINK_INLINE = '!inline appearance-none whitespace-normal break-words text-start leading-[inherit]';
 
 const FAQ: { q: string; a: ReactNode }[] = [
   {
@@ -30,15 +50,17 @@ const FAQ: { q: string; a: ReactNode }[] = [
     a: (
       <>
         <DocDialog
-          label="الأمر السامي رقم 7/ب/12814 وتاريخ 1420/08/13هـ"
+          label="الأمر السامي رقم 7/ب/12814"
           title="برقية الأمر السامي 7/ب/12814 — مكافأة الطلبة الجامعيين المعاقين"
           pages={['/docs/supreme-order-1.jpg']}
-        />
-        ، والفقرة (ز) من المادة 67 من{' '}
+          className={DOC_LINK_INLINE}
+        />{' '}
+        وتاريخ 1420/08/13هـ، والفقرة (ز) من المادة 67 من{' '}
         <DocDialog
           label="لائحة حقوق وواجبات الطالب"
           title="لائحة حقوق وواجبات الطالب — المواد 66–69 (م67/ز: بدل ذوي الاحتياجات الخاصة)"
           pages={['/docs/student-charter-1.jpg', '/docs/student-charter-2.jpg', '/docs/student-charter-3.jpg']}
+          className={DOC_LINK_INLINE}
         />{' '}
         بالجامعة نفسها، وقرار وزارة الموارد البشرية بتصنيف الإعاقة (الفئة الثانية). أي أن الجامعة
         تُطالَب بتطبيق لائحتها هي.
@@ -65,7 +87,7 @@ const FAQ: { q: string; a: ReactNode }[] = [
   },
   {
     q: 'هل جرّب الطالب «القنوات الرسمية»؟',
-    a: 'جرّبها كلها منذ 2023: تذاكر (أُغلقت أو صُنفت خطأً)، برقية رسمية لرئيس الجامعة (بلا رد)، خطابات ولقاءات، ثم الرفع للمقام السامي عبر إمارة منطقة مكة المكرمة والديوان الملكي. وعندما ذكر حسابات الجامعة على منصة X؟ حُظر من الحساب الرسمي لعمادة شؤون الطلاب ومن حساب كليته.',
+    a: 'جرّبها كلها منذ 2023: تذاكر (أُغلقت أو صُنفت خطأً)، برقية رسمية لرئيس الجامعة (بلا رد)، خطابات ولقاءات — ثم بعد استئناف الجامعة كان الرفع للمقام السامي عبر إمارة منطقة مكة المكرمة والديوان الملكي. وعندما ذكر حسابات الجامعة على منصة X؟ حُظر من الحساب الرسمي لعمادة شؤون الطلاب ومن حساب كليته.',
   },
   {
     q: 'من يقف خلف الموقع؟',
@@ -175,7 +197,7 @@ export default function App() {
             ))}
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <div className="flex w-full flex-col items-stretch justify-center gap-3 pt-2 sm:w-auto sm:flex-row sm:items-center">
             <Button size="lg" onClick={() => document.getElementById('faq-title')?.scrollIntoView({ behavior: 'smooth' })}>
               الأسئلة الشائعة
             </Button>
@@ -187,9 +209,9 @@ export default function App() {
 
           {/* العدادات */}
           <div className="grid w-full grid-cols-1 gap-3 pt-6 sm:grid-cols-3">
-            <Stat n={daysSince(JUDGMENT_DATE)} label="يومًا منذ النطق بالحكم الابتدائي" />
-            <Stat n={daysSince(DEED_DATE)} label="يومًا منذ استلام الصك" />
-            <Stat n={daysSince(APPEAL_DATE)} label="يومًا منذ استئناف الجامعة" />
+            <Stat n={daysSince(JUDGMENT_DATE)} label="منذ النطق بالحكم الابتدائي" />
+            <Stat n={daysSince(DEED_DATE)} label="منذ استلام الصك" />
+            <Stat n={daysSince(APPEAL_DATE)} label="منذ استئناف الجامعة" />
           </div>
           <Card className="w-full px-6 py-4">
             <p className="m-0 text-sm text-muted-foreground">
@@ -224,12 +246,14 @@ export default function App() {
                 label="الأمر السامي 7/ب/12814"
                 title="برقية الأمر السامي 7/ب/12814 — مكافأة الطلبة الجامعيين المعاقين"
                 pages={['/docs/supreme-order-1.jpg']}
+                className={DOC_LINK_INLINE}
               />{' '}
               ·{' '}
               <DocDialog
                 label="لائحة حقوق وواجبات الطالب (م67/ز)"
                 title="لائحة حقوق وواجبات الطالب — المواد 66–69 (م67/ز: بدل ذوي الاحتياجات الخاصة)"
                 pages={['/docs/student-charter-1.jpg', '/docs/student-charter-2.jpg', '/docs/student-charter-3.jpg']}
+                className={DOC_LINK_INLINE}
               />
             </p>
             <ol className="m-0 flex list-none flex-col gap-5 p-0">
@@ -283,9 +307,15 @@ export default function App() {
 }
 
 function Stat({ n, label }: { n: number; label: string }) {
+  const { num, word } = dayParts(n);
   return (
     <Card className="px-4 py-5">
-      <p className="m-0 text-4xl font-black tabular-nums">{n.toLocaleString('ar-SA')}</p>
+      <p className="m-0 flex items-baseline justify-center gap-2">
+        {num !== null && <span className="text-4xl font-black tabular-nums">{num}</span>}
+        <span className={num === null ? 'text-3xl font-black' : 'text-base font-bold text-muted-foreground'}>
+          {word}
+        </span>
+      </p>
       <p className="m-0 pt-1 text-xs text-muted-foreground">{label}</p>
     </Card>
   );

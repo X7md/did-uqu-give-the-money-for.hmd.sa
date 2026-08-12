@@ -1,20 +1,28 @@
 // رابط نصي يفتح نافذة (Dialog من Base UI) تعرض صور صفحات المستند.
 import { Dialog } from '@base-ui/react/dialog';
 import { FileText, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import type { ReactNode } from 'react';
 
 export function DocDialog({
   label,
   title,
   pages,
+  className,
 }: {
   label: ReactNode;
   title: string;
   pages: string[];
+  className?: string;
 }) {
   return (
     <Dialog.Root>
-      <Dialog.Trigger className="inline cursor-pointer border-0 bg-transparent p-0 align-baseline font-[inherit] text-[length:inherit] font-semibold text-primary underline decoration-primary/40 underline-offset-4 hover:decoration-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">
+      <Dialog.Trigger
+        className={cn(
+          'inline cursor-pointer border-0 bg-transparent p-0 align-baseline font-[inherit] text-[length:inherit] font-semibold text-primary underline decoration-primary/40 underline-offset-4 hover:decoration-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring',
+          className,
+        )}
+      >
         {label}
       </Dialog.Trigger>
       <Dialog.Portal>

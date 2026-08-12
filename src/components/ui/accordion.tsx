@@ -44,14 +44,7 @@ export function AccordionContent({
   ...props
 }: ComponentProps<typeof BaseAccordion.Panel>) {
   return (
-    <BaseAccordion.Panel
-      className={cn(
-        'h-[var(--accordion-panel-height)] overflow-hidden transition-[height] duration-200 ease-out',
-        'data-[ending-style]:h-0 data-[starting-style]:h-0',
-        className,
-      )}
-      {...props}
-    >
+    <BaseAccordion.Panel className={cn('overflow-hidden', className)} {...props}>
       <div className="pb-4 text-sm leading-7 text-muted-foreground">{children}</div>
     </BaseAccordion.Panel>
   );

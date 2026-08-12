@@ -30,11 +30,13 @@ export function DigitalStamp({
         aria-expanded={open}
         className="flex w-full cursor-pointer items-center gap-2.5 border-0 bg-transparent py-2 text-start focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
       >
-        <Stamp className="size-5 shrink-0 text-primary" aria-hidden />
-        <p className="m-0 grow text-sm font-medium text-foreground">{heading}</p>
-        <span className="flex items-center gap-2 text-sm text-primary">
+        <Stamp className="size-4 shrink-0 text-primary sm:size-5" aria-hidden />
+        <p className="m-0 grow text-[13px] font-medium leading-[18px] text-foreground sm:text-sm sm:leading-5">
+          {heading}
+        </p>
+        <span className="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-[13px] text-primary sm:gap-2 sm:text-sm">
           {open ? 'إخفاء التفاصيل' : 'عرض التفاصيل'}
-          <ChevronDown className={cn('size-5 transition-transform duration-200', open && 'rotate-180')} aria-hidden />
+          <ChevronDown className={cn('size-4 shrink-0 transition-transform duration-200 sm:size-5', open && 'rotate-180')} aria-hidden />
         </span>
       </button>
 
