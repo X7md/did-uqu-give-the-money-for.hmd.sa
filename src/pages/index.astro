@@ -1,24 +1,14 @@
 ---
 import '@/index.css';
 import { StampSection } from '@/components/sections/stamp-section';
-import { Hero } from '@/components/sections/hero';
-import { Counters } from '@/components/sections/counters';
-import { BentoSection } from '@/components/sections/bento';
-import { CasePathSection } from '@/components/sections/case-path';
-import { FaqSection } from '@/components/sections/faq';
-import { FAQ_LD } from '@/lib/case-data';
+import { Badge } from '@/components/ui/badge';
+import { STATUS } from '@/lib/case-data';
 import { CASE_NAME, COVERAGE_RANGE, SITE_DESCRIPTION, SITE_LAUNCHED_ISO, SITE_TITLE } from '@/lib/updates';
-
-const NAV = [
-  ['ما هذا البدل؟', '#intro-title'],
-  ['مسار القضية', '#path-title'],
-  ['الأسئلة الشائعة', '#faq-title'],
-];
 
 const SITE_URL = Astro.site?.href ?? 'https://did-uqu-give-the-money-to.hmd.sa/';
 const BUILD_TIME = new Date().toISOString(); // يتجدد مع إعادة البناء اليومية
 
-// schema.org: موقع + صفحة أسئلة شائعة عن قضية جارية — dateModified يتحدث يوميًا،
+// schema.org: موقع + صفحة هبوط عن قضية جارية — dateModified يتحدث يوميًا،
 // وtemporalCoverage فترة مفتوحة منذ بداية المدة المحكوم بها.
 const LD = {
   '@context': 'https://schema.org',
@@ -32,7 +22,7 @@ const LD = {
       inLanguage: 'ar',
     },
     {
-      '@type': ['WebPage', 'FAQPage'],
+      '@type': 'WebPage',
       '@id': `${SITE_URL}#page`,
       url: SITE_URL,
       name: SITE_TITLE,
@@ -50,11 +40,6 @@ const LD = {
           { '@type': 'PropertyValue', name: 'العام الهجري', value: '1447' },
         ],
       },
-      mainEntity: FAQ_LD.map(({ q, a }) => ({
-        '@type': 'Question',
-        name: q,
-        acceptedAnswer: { '@type': 'Answer', text: a },
-      })),
     },
   ],
 };
@@ -68,7 +53,7 @@ const LD = {
     <meta name="color-scheme" content="light" />
     <meta
       name="description"
-      content="صفحة حالة فكاهية بسؤال واحد: هل صرفت جامعة أم القرى بدل الإعاقة عن فترة سابقة؟ الجواب حتى الآن: لا (ليس بعد). تستند لوقائع الدعوى 75594 لعام 1447هـ."
+      content="صفحة حالة فكاهية بسؤال واحد: هل صرفت جامعة أم القرى بدل الإعاقة عن فترة سابقة؟ الجواب حتى الآن: لا (ليس بعد). القضية منظورة لدى الاستئناف — الدعوى 75594 لعام 1447هـ."
     />
     <title>هل صرفت الجامعة المستحقات؟ — لا (ليس بعد)</title>
     <link rel="canonical" href={SITE_URL} />
@@ -89,7 +74,7 @@ const LD = {
     <div dir="rtl" class="flex min-h-dvh flex-col">
       <StampSection client:load />
 
-      {/* شريط التنقل العلوي — على نمط dga-nav-header: 72px، خلفية بيضاء، فاصل سفلي */}
+      {/* شريط علوي — على نمط dga-nav-header: 72px، خلفية بيضاء، فاصل سفلي */}
       <header
         class="sticky top-0 z-40 h-[72px] w-full bg-card after:absolute after:bottom-0 after:left-0 after:block after:h-px after:w-full after:bg-border"
       >
@@ -108,20 +93,6 @@ const LD = {
               </p>
             </div>
           </div>
-          <ul class="m-0 hidden h-full list-none items-center p-0 md:flex">
-            {
-              NAV.map(([label, href]) => (
-                <li class="h-full">
-                  <a
-                    href={href}
-                    class="inline-flex h-full items-center gap-1 rounded-sm px-6 text-sm text-foreground no-underline hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
-                  >
-                    {label}
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
           <span
             class="hidden items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold text-muted-foreground sm:inline-flex"
           >
@@ -131,39 +102,33 @@ const LD = {
       </header>
 
       <div class="mx-auto flex w-full max-w-3xl grow flex-col px-5 py-8 lg:max-w-5xl">
-        {/* السؤال والجواب */}
-        <main class="flex flex-col items-center gap-6 py-14 text-center">
-          <Hero />
-          <Counters client:load />
+        {/* السؤال والجواب — صفحة هبوط فقط */}
+        <main class="flex grow flex-col items-center justify-center gap-6 py-14 text-center">
+          <h1 class="m-0 text-2xl font-bold sm:text-3xl">
+            هل صرفت جامعة أم القرى بدل الإعاقة عن فترة سابقة؟
+          </h1>
+
+          <p class="m-0 select-none text-[9rem] font-black leading-none text-destructive sm:text-[12rem]">
+            لا
+          </p>
+          <p class="m-0 text-2xl font-semibold text-muted-foreground">(ليس بعد)</p>
+
+          <p class="m-0 max-w-xl text-sm leading-7 text-muted-foreground">
+            القضية منظورة لدى الاستئناف — الحكم الابتدائي بإلغاء قرار الامتناع غير نهائي،
+            والتنفيذ معلق حتى تفصل محكمة الاستئناف.
+          </p>
+
+          <div class="flex flex-wrap items-center justify-center gap-2 pt-2">
+            {
+              STATUS.map(({ icon: Icon, label, detail, ok }) => (
+                <Badge variant={ok ? 'success' : 'destructive'}>
+                  <Icon className="size-3.5" aria-hidden="true" />
+                  {label} — {detail}
+                </Badge>
+              ))
+            }
+          </div>
         </main>
-
-        {/* التعريف — بينتو */}
-        <section aria-labelledby="intro-title" class="pb-10">
-          <h2 id="intro-title" class="m-0 mb-1 scroll-mt-6 text-xl font-bold">ما هذا «البدل» أصلًا؟</h2>
-          <p class="m-0 mb-4 text-sm text-muted-foreground">
-            تنظيم عمره أكثر من أربعين عامًا — لا طلبًا مستحدثًا.
-          </p>
-          <BentoSection client:load />
-        </section>
-
-        {/* مسار القضية */}
-        <section aria-labelledby="path-title" class="pb-10">
-          <h2 id="path-title" class="m-0 mb-1 scroll-mt-6 text-xl font-bold">مسار القضية باختصار</h2>
-          <p class="m-0 mb-4 text-sm text-muted-foreground">
-            النقطة المحورية: قرار الامتناع أُلغي بحكم ابتدائي — والخلاف الآن على تثبيت الإلغاء
-            استئنافيًا لا على أصل الحق.
-          </p>
-          <CasePathSection client:load />
-        </section>
-
-        {/* الأسئلة الشائعة */}
-        <section aria-labelledby="faq-title" class="pb-8">
-          <h2 id="faq-title" class="m-0 mb-1 scroll-mt-6 text-xl font-bold">الأسئلة الشائعة</h2>
-          <p class="m-0 mb-4 text-sm text-muted-foreground">
-            كل إجابة أدناه مسنودة بوثيقة في ملف الدعوى 75594 لعام 1447هـ.
-          </p>
-          <FaqSection client:load />
-        </section>
 
         <footer class="mt-auto border-t border-border pt-6 text-center text-xs leading-6 text-muted-foreground">
           <p class="m-0">

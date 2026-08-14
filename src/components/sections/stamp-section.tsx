@@ -13,7 +13,7 @@ export function StampSection() {
             <div className="inline-flex items-center gap-x-6 rounded-md border border-border/60 bg-card px-6 py-2">
               <Riyal className="size-6 shrink-0 text-primary" />
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <p className="m-0 text-sm font-normal text-foreground">قضية منظورة في المحكمة برقم:</p>
+                <p className="m-0 text-sm font-normal text-foreground">القضية منظورة لدى الاستئناف برقم:</p>
                 <a
                   className="cursor-pointer text-sm font-normal text-primary underline hover:text-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
                   href="https://www.bog.gov.sa"
